@@ -1,0 +1,34 @@
+
+#ticker_list {
+    overflow: hidden;
+}
+ul#ticker_list img{
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+ul#ticker_list li div img,
+ul#ticker_list li div div {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+ul#ticker_list li div span {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+ul#ticker_list li {
+    width: 150px;
+    list-style: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.positive i {
+    color: green;
+}
+
+.negative i {
+    color: red;
+}

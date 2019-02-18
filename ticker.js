@@ -1,71 +1,95 @@
-var xhr = new XMLHttpRequest();
-var url = 'https://api.coinmarketcap.com/v1/ticker/?limit=30';
+var Ticker = (function () {
+      /**
+       * Create ticket from CoinMarketCaps Api
+       * @param {Object} response json response from coinmarketcap api
+       * 
+       * @see https://coinmarketcap.com/api/documentation/v1/
+       */
+      function __Ticker(response) {
+            var div = document.getElementById('ticker');
+            var ticker = document.createElement('ul')
+            ticker.setAttribute('id', 'ticker_list')
 
-xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-        var response = JSON.parse(this.responseText);
-        new Ticker().init(response, true);
-    }
-};
-xhr.open("GET", url, true);
-xhr.send();
-function Ticker() {
+            for (var i = 0; i < response.length; i++) {
+                  var coin = response[i];
 
-    this.init = function(response, thumbnail) {
-        var div = document.getElementById('ticker');
-        var ticker = document.createElement('ul')
-        ticker.setAttribute('id', 'ticker_list')
+                  // Create List Item for Coin Data
+                  var li = document.createElement('li');
+                  var node = li.appendChild(document.createElement('div'));
+                  var ts = node.appendChild(document.createElement('span'))
 
-        for (var i = 0; i < response.length; i++) {
-            var coin = response[i];
-            var li = document.createElement('li');
-            var node = li.appendChild(document.createElement('div'));
-            var ts = node.appendChild(document.createElement('span'))
-            ts.innerHTML = coin.symbol;
-            if (thumbnail) {
-                var img = node.appendChild(document.createElement('img'))
-                img.src = this.thumbnail(coin.id);
-                img.alt = coin.name;
-                img.width = '32'
+                  // Add Ticket Symbol to <span>
+                  ts.innerHTML = coin.symbol;
+
+                  // Create <img> tag inside the ticker <div>
+                  var img = node.appendChild(document.createElement('img'))
+
+                  // Adding an event listener to remove any images that do not render
+                  img.addEventListener('error', function () {
+                        this.parentNode.removeChild(this);
+                  });
+
+                  // Call private function to get the url of the image of coin
+                  img.src = this.__getThumbnail(coin.id);
+                  img.alt = coin.name;
+                  img.width = '32' // 32x32px
+                  
+                  // Create Data Element
+                  var metadata = node.appendChild(document.createElement('div'))
+
+                  // Create 24h Perecnt Change Element 
+                  var percent_change_24h = document.createElement('span');
+                  percent_change_24h.setAttribute('id', 'percent_change_24h');
+
+                  var arrow = percent_change_24h.appendChild(document.createElement('i'));
+                  // Arrow Down and Red Color of negative percent change 24h
+                  if (coin.percent_change_24h < 0) {
+                        arrow.setAttribute('class', 'fa fa-arrow-down')
+                        metadata.setAttribute('class', 'negative');
+                  
+                  // Arrow Up and Green Color of negative percent change 24h
+                  } else {
+                        arrow.setAttribute('class', 'fa fa-arrow-up')
+                        metadata.setAttribute('class', 'positive');
+                  }
+                  percent_change_24h.innerHTML += ' ' + coin.percent_change_24h + '%';
+                  metadata.appendChild(percent_change_24h);
+
+                  // Create Current Price USD Element
+                  var price_usd = document.createElement('span');
+                  price_usd.setAttribute('id', 'price_usd');
+                  var usd = coin.price_usd + '0';
+                  var tenths = usd.match(/\.\d\d/);
+                  usd = usd.replace(/\..*/, tenths);
+                  price_usd.innerHTML = '$ ' + usd;
+                  metadata.appendChild(price_usd);
+                  ticker.appendChild(li)
             }
+            div.appendChild(ticker)
 
-
-            var metdata = node.appendChild(document.createElement('div'))
-            var percent_change_24h = document.createElement('span');
-            percent_change_24h.setAttribute('id', 'percent_change_24h');
-            var arrow = percent_change_24h.appendChild(document.createElement('i'));
-            if (coin.percent_change_24h < 0) {
-                arrow.setAttribute('class', 'fa fa-arrow-down')
-                metdata.setAttribute('class', 'negative');
-            } else {
-                arrow.setAttribute('class', 'fa fa-arrow-up')
-                metdata.setAttribute('class', 'positive');
-            }
-            percent_change_24h.innerHTML += ' ' + coin.percent_change_24h + '%';
-            metdata.appendChild(percent_change_24h);
-            var price_usd = document.createElement('span');
-            price_usd.setAttribute('id', 'price_usd');
-            var usd = coin.price_usd + '0';
-            var tenths = usd.match(/\.\d\d/);
-            usd = usd.replace(/\..*/, tenths);
-            price_usd.innerHTML = '$ ' + usd;
-            metdata.appendChild(price_usd);
-            ticker.appendChild(li)
-        }
-        div.appendChild(ticker)
-        $(function() {
-            $('#ticker').marquee({
-                duration: 5000,
-                duplicated: true,
-                pauseOnHover: true,
-                delayBeforeStart: 0,
-                gap: 50,
-                duplicated: true
+            /**
+             * Initializing the Marquee Motion
+             * @see https://github.com/aamirafridi/jQuery.Marquee
+             */
+            $(function () {
+                  $('#ticker').marquee({
+                        duration: 13000,
+                        duplicated: true,
+                        pauseOnHover: true,
+                        delayBeforeStart: -100,
+                        gap: 0,
+                        duplicated: true
+                  });
             });
-        });
-    }
-    this.thumbnail = function(id) {
-        return 'https://files.coinmarketcap.com/static/img/coins/32x32/' + id + '.png';
-    }
-}
+      }
+      /**
+       * Using Image Hosted by 
+       * @see https://cryptoindex.co/
+       */
+      __Ticker.prototype.__getThumbnail = function (id) {
+            return 'https://cryptoindex.co/coinlogo/' + id + '.png';
+            
+      }
+      return __Ticker;
+})();
 

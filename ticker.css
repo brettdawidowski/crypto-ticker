@@ -3,8 +3,8 @@
     overflow: hidden;
 }
 ul#ticker_list img{
-    -webkit-filter: grayscale(100%);
-    filter: grayscale(100%);
+    /* -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);*/
 }
 ul#ticker_list li div img,
 ul#ticker_list li div div {
@@ -25,10 +25,10 @@ ul#ticker_list li {
     text-align: center;
 }
 
-.positive i {
+.positive {
     color: green;
 }
 
-.negative i {
+.negative {
     color: red;
 }
